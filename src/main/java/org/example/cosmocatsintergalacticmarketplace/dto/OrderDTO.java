@@ -5,7 +5,6 @@ import java.util.List;
 
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
     private Long id;

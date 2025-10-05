@@ -8,7 +8,6 @@ import org.example.cosmocatsintergalacticmarketplace.validation.CosmoWordCheck;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class ProductDetailDTO {
     private Long id;
