@@ -1,5 +1,6 @@
 package org.example.cosmocatsintergalacticmarketplace.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.cosmocatsintergalacticmarketplace.dto.CartDTO;
 import org.example.cosmocatsintergalacticmarketplace.mapper.CartMapper;
@@ -20,7 +21,7 @@ public class CartController {
     private final CartMapper cartMapper;
 
     @PostMapping
-    public CartDTO create(@RequestBody CartDTO dto) {
+    public CartDTO create(@Valid @RequestBody CartDTO dto) {
         Cart created = cartService.create(cartMapper.toCartDomain(dto));
         return cartMapper.toCartDTO(created);
     }

@@ -1,5 +1,6 @@
 package org.example.cosmocatsintergalacticmarketplace.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.cosmocatsintergalacticmarketplace.domain.Product;
 import org.example.cosmocatsintergalacticmarketplace.dto.ProductAvailabilityDTO;
@@ -22,7 +23,7 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @PostMapping
-    public ProductDTO create(@RequestBody ProductDTO productDTO) {
+    public ProductDTO create(@Valid @RequestBody ProductDTO productDTO) {
         System.out.println("productDTO: " + productDTO);
         Product product = productMapper.toProductDomain(productDTO);
         System.out.println("product: " + product);
@@ -47,7 +48,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> update(@PathVariable Long id,
+    public ResponseEntity<ProductDTO> update(@Valid @PathVariable Long id,
                                                    @RequestBody ProductDTO productDTO) {
         Product product = productMapper.toProductDomain(productDTO);
         return productService.update(id, product)

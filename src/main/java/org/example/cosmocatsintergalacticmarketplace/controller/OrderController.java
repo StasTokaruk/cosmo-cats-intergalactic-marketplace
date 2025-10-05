@@ -1,5 +1,6 @@
 package org.example.cosmocatsintergalacticmarketplace.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.cosmocatsintergalacticmarketplace.dto.OrderDTO;
 import org.example.cosmocatsintergalacticmarketplace.mapper.OrderMapper;
@@ -20,7 +21,7 @@ public class OrderController {
     private final OrderMapper orderMapper;
 
     @PostMapping
-    public OrderDTO create(@RequestBody OrderDTO dto) {
+    public OrderDTO create(@Valid  @RequestBody OrderDTO dto) {
         Order created = orderService.create(orderMapper.toOrderDomain(dto));
         return orderMapper.toOrderDTO(created);
     }

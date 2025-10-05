@@ -1,5 +1,6 @@
 package org.example.cosmocatsintergalacticmarketplace.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,6 +20,7 @@ public class ProductDTO {
     @Positive(message = "price must be positive")
     private Double price;
 
+    @Valid
     @NotNull(message = "category must be provided")
     private CategoryDTO category;
 

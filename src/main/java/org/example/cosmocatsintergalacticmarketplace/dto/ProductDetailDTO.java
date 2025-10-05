@@ -1,5 +1,6 @@
 package org.example.cosmocatsintergalacticmarketplace.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,6 +15,7 @@ public class ProductDetailDTO {
     @NotBlank(message = "name must not be blank")
     private String name;
 
+    @Valid
     @NotNull(message = "category must be provided")
     private CategoryDTO category;
 
