@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
         Long id = nextId();
         product.setId(id);
         store.put(id, product);
+        System.out.println("Created product: " + product);
         return product;
     }
 

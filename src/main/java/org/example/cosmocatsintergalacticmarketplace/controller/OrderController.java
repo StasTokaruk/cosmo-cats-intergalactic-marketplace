@@ -21,22 +21,22 @@ public class OrderController {
 
     @PostMapping
     public OrderDTO create(@RequestBody OrderDTO dto) {
-        Order created = orderService.create(orderMapper.toDomain(dto));
-        return orderMapper.toDTO(created);
+        Order created = orderService.create(orderMapper.toOrderDomain(dto));
+        return orderMapper.toOrderDTO(created);
     }
 
     @GetMapping
     public List<OrderDTO> getAll() {
         return orderService.findAll()
                 .stream()
-                .map(orderMapper::toDTO)
+                .map(orderMapper::toOrderDTO)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> getById(@PathVariable Long id) {
         return orderService.findById(id)
-                .map(orderMapper::toDTO)
+                .map(orderMapper::toOrderDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

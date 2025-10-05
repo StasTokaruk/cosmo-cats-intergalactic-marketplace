@@ -21,15 +21,15 @@ public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
 
-    // --- CREATE ---
     @PostMapping
     public ProductDTO create(@RequestBody ProductDTO productDTO) {
+        System.out.println("productDTO: " + productDTO);
         Product product = productMapper.toProductDomain(productDTO);
+        System.out.println("product: " + product);
         Product saved_product = productService.create(product);
         return productMapper.toProductDTO(saved_product);
     }
 
-    // --- GET ALL (коротка інфа: список) ---
     @GetMapping
     public List<ProductAvailabilityDTO> getAll() {
         return productService.findAll()
@@ -38,7 +38,6 @@ public class ProductController {
                 .collect(Collectors.toList());
     }
 
-    // --- GET ONE (детальна інфа) ---
     @GetMapping("/{id}")
     public ResponseEntity<ProductDetailDTO> getById(@PathVariable Long id) {
         return productService.findById(id)
@@ -47,7 +46,6 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- UPDATE ---
     @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> update(@PathVariable Long id,
                                                    @RequestBody ProductDTO productDTO) {
@@ -58,7 +56,6 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- DELETE ---
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return productService.delete(id) ?

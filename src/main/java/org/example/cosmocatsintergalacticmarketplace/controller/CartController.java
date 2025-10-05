@@ -21,22 +21,22 @@ public class CartController {
 
     @PostMapping
     public CartDTO create(@RequestBody CartDTO dto) {
-        Cart created = cartService.create(cartMapper.toDomain(dto));
-        return cartMapper.toDTO(created);
+        Cart created = cartService.create(cartMapper.toCartDomain(dto));
+        return cartMapper.toCartDTO(created);
     }
 
     @GetMapping
     public List<CartDTO> getAll() {
         return cartService.findAll()
                 .stream()
-                .map(cartMapper::toDTO)
+                .map(cartMapper::toCartDTO)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CartDTO> getById(@PathVariable Long id) {
         return cartService.findById(id)
-                .map(cartMapper::toDTO)
+                .map(cartMapper::toCartDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
