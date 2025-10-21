@@ -8,12 +8,14 @@ import org.example.cosmocatsintergalacticmarketplace.domain.Cart;
 import org.example.cosmocatsintergalacticmarketplace.service.CartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/carts")
+@RequestMapping("/api/v1/carts")
 @RequiredArgsConstructor
 public class CartController {
 
@@ -21,9 +23,17 @@ public class CartController {
     private final CartMapper cartMapper;
 
     @PostMapping
-    public CartDTO create(@Valid @RequestBody CartDTO dto) {
+    public ResponseEntity<CartDTO> create(@Valid @RequestBody CartDTO dto) {
         Cart created = cartService.create(cartMapper.toCartDomain(dto));
-        return cartMapper.toCartDTO(created);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(cartMapper.toCartDTO(created));
     }
 
     @GetMapping
@@ -43,7 +53,8 @@ public class CartController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         cartService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

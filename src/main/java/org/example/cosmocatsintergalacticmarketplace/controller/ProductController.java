@@ -10,12 +10,14 @@ import org.example.cosmocatsintergalacticmarketplace.mapper.ProductMapper;
 import org.example.cosmocatsintergalacticmarketplace.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -23,12 +25,18 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @PostMapping
-    public ProductDTO create(@Valid @RequestBody ProductDTO productDTO) {
-        System.out.println("productDTO: " + productDTO);
+    public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO productDTO) {
         Product product = productMapper.toProductDomain(productDTO);
-        System.out.println("product: " + product);
         Product saved_product = productService.create(product);
-        return productMapper.toProductDTO(saved_product);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved_product.getId())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(productMapper.toProductDTO(saved_product));
     }
 
     @GetMapping
@@ -49,7 +57,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> update(@Valid @PathVariable Long id,
-                                                   @RequestBody ProductDTO productDTO) {
+                                             @RequestBody ProductDTO productDTO) {
         Product product = productMapper.toProductDomain(productDTO);
         return productService.update(id, product)
                 .map(productMapper::toProductDTO)
@@ -59,8 +67,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        return productService.delete(id) ?
-                ResponseEntity.noContent().build() :
-                ResponseEntity.notFound().build();
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

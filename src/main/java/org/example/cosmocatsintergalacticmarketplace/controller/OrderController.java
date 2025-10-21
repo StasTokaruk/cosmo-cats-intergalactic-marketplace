@@ -8,12 +8,14 @@ import org.example.cosmocatsintergalacticmarketplace.domain.Order;
 import org.example.cosmocatsintergalacticmarketplace.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -21,9 +23,17 @@ public class OrderController {
     private final OrderMapper orderMapper;
 
     @PostMapping
-    public OrderDTO create(@Valid  @RequestBody OrderDTO dto) {
+    public ResponseEntity<OrderDTO> create(@Valid  @RequestBody OrderDTO dto) {
         Order created = orderService.create(orderMapper.toOrderDomain(dto));
-        return orderMapper.toOrderDTO(created);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(orderMapper.toOrderDTO(created));
     }
 
     @GetMapping
@@ -43,7 +53,8 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         orderService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
