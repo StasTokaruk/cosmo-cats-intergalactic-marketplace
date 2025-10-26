@@ -15,7 +15,7 @@ public class CartServiceImpl implements CartService {
     private final AtomicLong idGen = new AtomicLong(0);
 
     @PostConstruct
-    private void initMockData() {
+    void initMockData() {
         store.put(1L, new Cart(1L, new ArrayList<>(), 0.0));
         store.put(2L, new Cart(2L, new ArrayList<>(), 0.0));
         idGen.set(2);
