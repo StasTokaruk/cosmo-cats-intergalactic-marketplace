@@ -32,6 +32,14 @@ dependencies {
     implementation "org.mapstruct:mapstruct:1.5.5.Final"
     annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
 
+    //RestClient та тестування
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Для тестування з WireMock
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
+    testImplementation 'io.projectreactor:reactor-test'
+
     // Swagger/OpenAPI (springdoc)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
 
