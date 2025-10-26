@@ -22,7 +22,7 @@ jobs:
           java-version: '21'
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -38,7 +38,7 @@ jobs:
         run: ./gradlew clean build jacocoTestReport
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-coverage-report
           path: build/reports/jacoco/test/html
