@@ -16,7 +16,7 @@ public class ProductServiceImpl implements ProductService {
     private final AtomicLong idGen = new AtomicLong(0);
 
     @PostConstruct
-    private void initMockData() {
+    void initMockData() {
         store.put(1L, new Product(1L, "Laser Sword", 999.0,
                 new Category(1L, "Electronics"), "Space weapon", 5.0));
         store.put(2L, new Product(2L, "Cosmo Book", 49.0,
