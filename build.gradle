@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'org.example'
@@ -19,24 +20,56 @@ repositories {
 }
 
 dependencies {
+    // --- Core dependencies ---
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Lombok
-    compileOnly "org.projectlombok:lombok:1.18.30"
-    annotationProcessor "org.projectlombok:lombok:1.18.30"
+    // --- Lombok ---
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    // MapStruct
-    implementation "org.mapstruct:mapstruct:1.5.5.Final"
-    annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+    // --- MapStruct ---
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-    // Swagger/OpenAPI (springdoc)
+    // --- Swagger/OpenAPI ---
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
 
+    // --- Tests ---
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.6 // 80% coverage.yml target
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn jacocoTestCoverageVerification
 }
