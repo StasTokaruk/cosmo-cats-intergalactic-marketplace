@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: cosmo-cats-intergalactic-marketplace
+
+application:
+  rating-service:
+    base-path: http://localhost:8089
+    ratings: ${application.rating-service.base-path}/rating-service/v1/ratings
+
+  feature:
+    toggles:
+      cosmo-cats: true
+      kitty-products: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+application:
+  feature:
+    toggles:
+      cosmo-cats: true
+      kitty-products: false
