@@ -20,33 +20,29 @@ repositories {
 }
 
 dependencies {
+    // --- Core dependencies ---
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // --- Lombok ---
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    // Lombok
-    compileOnly "org.projectlombok:lombok:1.18.30"
-    annotationProcessor "org.projectlombok:lombok:1.18.30"
+    // --- MapStruct ---
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-    // MapStruct
-    implementation "org.mapstruct:mapstruct:1.5.5.Final"
-    annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
-
-    //RestClient та тестування
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-    // Для тестування з WireMock
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
-    testImplementation 'io.projectreactor:reactor-test'
-
-    // Swagger/OpenAPI (springdoc)
+    // --- Swagger/OpenAPI ---
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
 
+    // --- Tests ---
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation 'org.wiremock:wiremock-standalone:3.3.1'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
@@ -70,7 +66,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.6
+                minimum = 0.6 // 80% coverage.yml target
             }
         }
     }
