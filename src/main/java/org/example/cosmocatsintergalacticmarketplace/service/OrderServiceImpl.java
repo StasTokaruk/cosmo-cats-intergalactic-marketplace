@@ -4,6 +4,8 @@ import org.example.cosmocatsintergalacticmarketplace.domain.Order;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,8 +18,8 @@ public class OrderServiceImpl implements OrderService {
 
     @PostConstruct
     void initMockData() {
-        store.put(1L, new Order(1L, new ArrayList<>(), 0.0));
-        store.put(2L, new Order(2L, new ArrayList<>(), 0.0));
+        store.put(1L, new Order(1L, new ArrayList<>(), BigDecimal.ZERO));
+        store.put(2L, new Order(2L, new ArrayList<>(), BigDecimal.ZERO));
         idGen.set(2);
     }
 

@@ -1,0 +1,190 @@
+databaseChangeLog:
+  - changeSet:
+      id: changelog-init-sequences
+      author: stas, mishanya
+      changes:
+        - createSequence:
+            sequenceName: seq_category
+            startValue: 1
+            incrementBy: 1
+        - createSequence:
+            sequenceName: seq_product
+            startValue: 1
+            incrementBy: 1
+        - createSequence:
+            sequenceName: seq_order
+            startValue: 1
+            incrementBy: 1
+        - createSequence:
+            sequenceName: seq_order_item
+            startValue: 1
+            incrementBy: 1
+        - createSequence:
+            sequenceName: seq_cart
+            startValue: 1
+            incrementBy: 1
+        - createSequence:
+            sequenceName: seq_cart_item
+            startValue: 1
+            incrementBy: 1
+
+  - changeSet:
+      id: changelog-init-tables
+      author: stas, mishanya
+      changes:
+        # CATEGORY
+        - createTable:
+            tableName: category
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('seq_category')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+
+        # PRODUCT
+        - createTable:
+            tableName: product
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('seq_product')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: price
+                  type: DECIMAL(10, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: INT
+              - column:
+                  name: category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_product_category
+                    references: category(id)
+
+        # CART
+        - createTable:
+            tableName: cart
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('seq_cart')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: DECIMAL(10, 2)
+
+        # CART ITEMS
+        - createTable:
+            tableName: cart_items
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('seq_cart_item')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: cart_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_cart_items_cart
+                    references: cart(id)
+              - column:
+                  name: product_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_cart_items_product
+                    references: product(id)
+              - column:
+                  name: quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+
+        # ORDERS
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('seq_order')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: order_number
+                  type: VARCHAR(64)
+              - column:
+                  name: total_price
+                  type: DECIMAL(10, 2)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        # ORDER ITEMS
+        - createTable:
+            tableName: order_items
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('seq_order_item')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_order_items_order
+                    references: orders(id)
+              - column:
+                  name: product_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_order_items_product
+                    references: product(id)
+              - column:
+                  name: quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price_at_purchase
+                  type: DECIMAL(10, 2)

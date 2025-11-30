@@ -2,6 +2,8 @@ package org.example.cosmocatsintergalacticmarketplace.domain;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * DDD model: Product — reprsent goods on marketplace.
  */
@@ -12,7 +14,7 @@ import lombok.*;
 public class Product {
     private Long id;
     private String name;
-    private Double price;
+    private BigDecimal price;
     private Category category;
     private String description;
     private Double quantity;

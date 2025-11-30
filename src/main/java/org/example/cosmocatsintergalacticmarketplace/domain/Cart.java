@@ -2,6 +2,7 @@ package org.example.cosmocatsintergalacticmarketplace.domain;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -15,6 +16,6 @@ import java.util.List;
 public class Cart {
     private Long id;
     private List<Product> products;
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 
 }

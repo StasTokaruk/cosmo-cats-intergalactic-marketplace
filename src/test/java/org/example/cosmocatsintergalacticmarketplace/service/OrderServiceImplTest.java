@@ -5,6 +5,7 @@ import org.example.cosmocatsintergalacticmarketplace.domain.Product; // Прип
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +46,7 @@ class OrderServiceImplTest {
 
     @Test
     void shouldCreateNewOrder() {
-        Order newOrder = new Order(null, EMPTY_ITEMS, 50.0);
+        Order newOrder = new Order(null, EMPTY_ITEMS, BigDecimal.valueOf(50.0));
 
         Order created = service.create(newOrder);
 
@@ -55,8 +56,8 @@ class OrderServiceImplTest {
 
     @Test
     void shouldGenerateSequentialIds() {
-        Order first = service.create(new Order(null, EMPTY_ITEMS, 1.0));
-        Order second = service.create(new Order(null, EMPTY_ITEMS, 2.0));
+        Order first = service.create(new Order(null, EMPTY_ITEMS, BigDecimal.valueOf(5.0)));
+        Order second = service.create(new Order(null, EMPTY_ITEMS, BigDecimal.valueOf(2.0)));
 
         assertTrue(second.getId() > first.getId(), "Наступний ID має бути більшим за попередній");
     }
@@ -64,7 +65,7 @@ class OrderServiceImplTest {
 
     @Test
     void shouldUpdateExistingOrder() {
-        Order update = new Order(null, EMPTY_ITEMS, 150.75);
+        Order update = new Order(null, EMPTY_ITEMS, BigDecimal.valueOf(150.75));
 
         Optional<Order> result = service.update(1L, update);
 
@@ -74,7 +75,7 @@ class OrderServiceImplTest {
 
     @Test
     void shouldReturnEmptyWhenUpdatingNonExisting() {
-        Order fake = new Order(null, EMPTY_ITEMS, 10.0);
+        Order fake = new Order(null, EMPTY_ITEMS, BigDecimal.TEN);
 
         Optional<Order> result = service.update(999L, fake);
         assertTrue(result.isEmpty(), "Оновлення неіснуючого замовлення має повернути порожній Optional");

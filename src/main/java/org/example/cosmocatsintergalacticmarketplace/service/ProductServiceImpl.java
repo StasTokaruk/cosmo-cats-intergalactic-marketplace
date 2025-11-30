@@ -5,6 +5,8 @@ import org.example.cosmocatsintergalacticmarketplace.domain.Category;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,9 +19,9 @@ public class ProductServiceImpl implements ProductService {
 
     @PostConstruct
     void initMockData() {
-        store.put(1L, new Product(1L, "Laser Sword", 999.0,
+        store.put(1L, new Product(1L, "Laser Sword", BigDecimal.valueOf(999.0),
                 new Category(1L, "Electronics"), "Space weapon", 5.0));
-        store.put(2L, new Product(2L, "Cosmo Book", 49.0,
+        store.put(2L, new Product(2L, "Cosmo Book", BigDecimal.valueOf(49.0),
                 new Category(2L, "Books"), "Manual for pilots", 20.0));
         idGen.set(2);
     }

@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: changelog-constraints-unique
+      author: stas, mishanya
+      changes:
+        # Унікальна назва продукту
+        - addUniqueConstraint:
+            tableName: category
+            columnNames: name
+            constraintName: uk_category_name
+
+        # Унікальна назва продукту всередині категорії
+        - addUniqueConstraint:
+            tableName: product
+            columnNames: category_id, name
+            constraintName: uk_product_name_in_category
+
+  - changeSet:
+      id: changelog-constraints-indexes
+      author: stas, mishanya
+      changes:
+        # Індекс для швидкого пошуку по назві
+        - createIndex:
+            tableName: product
+            indexName: idx_product_name
+            columns:
+              - column:
+                  name: name

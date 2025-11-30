@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/changelog-init.yaml
+  - include:
+      file: liquibase/changelog-constraints.yaml
