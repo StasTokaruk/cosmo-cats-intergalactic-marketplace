@@ -1,6 +1,5 @@
 package org.example.cosmocatsintergalacticmarketplace.featuretoggle.aspect;
 
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,11 +21,12 @@ public class FeatureToggleAspect {
     @Around("@annotation(featureToggle)")
     public Object around(ProceedingJoinPoint pjp, FeatureToggleAnnotation featureToggle) throws Throwable {
         String featureKey = featureToggle.value();
-        boolean enabled = props.isEnabled(featureKey);
 
+        boolean enabled = props.isEnabled(featureKey);
         if (!enabled) {
             throw new FeatureNotAvailableException(featureKey);
         }
+
         return pjp.proceed();
     }
 }

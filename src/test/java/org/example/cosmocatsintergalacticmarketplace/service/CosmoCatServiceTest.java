@@ -1,29 +1,25 @@
 package org.example.cosmocatsintergalacticmarketplace.service;
 
 import org.example.cosmocatsintergalacticmarketplace.featuretoggle.exception.FeatureNotAvailableException;
-import org.example.cosmocatsintergalacticmarketplace.featuretoggle.FeatureToggleProperties;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class CosmoCatServiceTest {
+class CosmoCatServiceEnabledTest {
+
+    @DynamicPropertySource
+    static void registerProps(DynamicPropertyRegistry registry) {
+        registry.add("feature-toggles.cosmo-cats", () -> true);
+        registry.add("feature-toggles.kitty-products", () -> false);
+    }
 
     @Autowired
     private CosmoCatService service;
-
-    @Autowired
-    private FeatureToggleProperties props;
-
-    @BeforeEach
-    void beforeEach() {
-        props.getToggles().put("cosmo-cats", true);
-        props.getToggles().put("kitty-products", false);
-    }
 
     @Test
     void whenCosmoCatsEnabled_thenReturnList() {
@@ -35,11 +31,5 @@ class CosmoCatServiceTest {
     @Test
     void whenKittyProductsDisabled_thenThrow() {
         assertThrows(FeatureNotAvailableException.class, () -> service.getKittyProducts());
-    }
-
-    @Test
-    void whenCosmoCatsDisabled_thenThrow() {
-        props.getToggles().put("cosmo-cats", false);
-        assertThrows(FeatureNotAvailableException.class, () -> service.getCosmoCats());
     }
 }

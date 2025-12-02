@@ -20,6 +20,7 @@ spring:
     activate:
       on-profile: dev
 
+
 application:
   feature:
     toggles:

@@ -1,9 +1,8 @@
 package org.example.cosmocatsintergalacticmarketplace.featuretoggle.exception;
 
-
 public class FeatureNotAvailableException extends RuntimeException {
+
     public FeatureNotAvailableException(String featureName) {
-        super("Feature '" + featureName + "' is currently disabled.");
+        super(String.format("Feature '%s' is currently disabled.", featureName));
     }
 }
-
