@@ -6,7 +6,7 @@ servers:
   - url: http://localhost:8080
     description: Generated server url
 paths:
-  /api/products/{id}:
+  /api/v1/products/{id}:
     get:
       tags:
         - product-controller
@@ -63,7 +63,7 @@ paths:
       responses:
         '200':
           description: OK
-  /api/products:
+  /api/v1/products:
     get:
       tags:
         - product-controller
@@ -94,7 +94,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ProductDTO'
-  /api/orders:
+  /api/v1/orders:
     get:
       tags:
         - order-controller
@@ -125,7 +125,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrderDTO'
-  /api/carts:
+  /api/v1/carts:
     get:
       tags:
         - cart-controller
@@ -156,7 +156,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/CartDTO'
-  /api/orders/{id}:
+  /api/v1/orders/{id}:
     get:
       tags:
         - order-controller
@@ -189,7 +189,35 @@ paths:
       responses:
         '200':
           description: OK
-  /api/carts/{id}:
+  /api/v1/feature-products:
+    get:
+      tags:
+        - cosmo-cat-controller
+      operationId: products
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/cats:
+    get:
+      tags:
+        - cosmo-cat-controller
+      operationId: cats
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/carts/{id}:
     get:
       tags:
         - cart-controller
