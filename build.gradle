@@ -56,6 +56,13 @@ dependencies {
     // Liquibase
     implementation 'org.liquibase:liquibase-core'
 
+    // Основна бібліотека для інтеграції з JUnit 5
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.7'
+
+    // Модуль саме для PostgreSQL контейнера
+    testImplementation 'org.testcontainers:postgresql:1.19.7'
+
+
 }
 
 tasks.named('test') {
