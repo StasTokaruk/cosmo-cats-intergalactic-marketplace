@@ -11,9 +11,11 @@ public interface OrderMapper {
     OrderDTO toOrderDTO(Order order);
     Order toOrderDomain(OrderDTO orderDTO);
 
-    @Mapping(target = "products", ignore = true) // Тут потрібна складна логіка мапінгу списків, MapStruct може не впоратись автоматично без конфігу
+    @Mapping(target = "products", ignore = true)
     Order toDomain(OrderEntity entity);
 
     @Mapping(target = "items", ignore = true)
+    @Mapping(target = "orderNumber", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     OrderEntity toEntity(Order order);
 }
