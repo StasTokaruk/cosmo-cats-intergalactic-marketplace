@@ -4,6 +4,7 @@ import org.example.cosmocatsintergalacticmarketplace.domain.Product;
 import org.example.cosmocatsintergalacticmarketplace.dto.ProductAvailabilityDTO;
 import org.example.cosmocatsintergalacticmarketplace.dto.ProductDTO;
 import org.example.cosmocatsintergalacticmarketplace.dto.ProductDetailDTO;
+import org.example.cosmocatsintergalacticmarketplace.repositories.entity.ProductEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = {CategoryMapper.class})
@@ -19,4 +20,8 @@ public interface ProductMapper {
     // Мапінг для всього продукту
     ProductDTO toProductDTO(Product product);
     Product toProductDomain(ProductDTO productDTO);
+
+
+    Product toDomain(ProductEntity entity);
+    ProductEntity toEntity(Product product);
 }

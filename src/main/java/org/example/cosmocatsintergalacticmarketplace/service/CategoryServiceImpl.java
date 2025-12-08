@@ -1,40 +1,65 @@
 package org.example.cosmocatsintergalacticmarketplace.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cosmocatsintergalacticmarketplace.domain.Category;
+import org.example.cosmocatsintergalacticmarketplace.mapper.CategoryMapper;
+import org.example.cosmocatsintergalacticmarketplace.repositories.CategoryRepository;
+import org.example.cosmocatsintergalacticmarketplace.repositories.entity.CategoryEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-    private final Map<Long, Category> store = new ConcurrentHashMap<>();
-    private final AtomicLong idGen = new AtomicLong(0);
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @Override
+    @Transactional
     public Category create(Category category) {
-        Long id = idGen.incrementAndGet();
-        category.setId(id);
-        store.put(id, category);
-        return category;
+        CategoryEntity entity = categoryMapper.toEntity(category);
+        CategoryEntity savedEntity = categoryRepository.save(entity);
+        return categoryMapper.toDomain(savedEntity);
     }
 
     @Override
-    public List<Category> findAll() { return new ArrayList<>(store.values()); }
+    @Transactional(readOnly = true)
+    public List<Category> findAll() {
+        return categoryRepository.findAll().stream()
+                .map(categoryMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 
     @Override
-    public Optional<Category> findById(Long id) { return Optional.ofNullable(store.get(id)); }
+    @Transactional(readOnly = true)
+    public Optional<Category> findById(Long id) {
+        return categoryRepository.findById(id)
+                .map(categoryMapper::toDomain);
+    }
 
     @Override
+    @Transactional
     public Optional<Category> update(Long id, Category category) {
-        if (!store.containsKey(id)) return Optional.empty();
-        category.setId(id);
-        store.put(id, category);
-        return Optional.of(category);
+        return categoryRepository.findById(id)
+                .map(existingEntity -> {
+                    existingEntity.setName(category.getName());
+                    return categoryRepository.save(existingEntity);
+                })
+                .map(categoryMapper::toDomain);
     }
 
     @Override
-    public boolean delete(Long id) { return store.remove(id) != null; }
+    @Transactional
+    public boolean delete(Long id) {
+        if (categoryRepository.existsById(id)) {
+            categoryRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }

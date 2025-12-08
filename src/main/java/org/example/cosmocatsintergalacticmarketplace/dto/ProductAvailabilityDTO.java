@@ -18,7 +18,7 @@ public class ProductAvailabilityDTO {
 
     @NotNull(message = "must be in stock")
     @Positive(message = "quantity must be positive and in stock")
-    private Double quantity;
+    private Integer quantity;
 }
 
 

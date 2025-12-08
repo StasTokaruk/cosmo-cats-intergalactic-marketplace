@@ -1,6 +1,8 @@
 package org.example.cosmocatsintergalacticmarketplace.service;
 
 import org.example.cosmocatsintergalacticmarketplace.domain.Order;
+import org.example.cosmocatsintergalacticmarketplace.repositories.projection.TopProductProjection;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +13,7 @@ public interface OrderService {
     Optional<Order> findById(Long id);
     Optional<Order> update(Long id, Order order);
     boolean delete(Long id);
+
+    List<TopProductProjection> getTopSellingProducts();
+
 }

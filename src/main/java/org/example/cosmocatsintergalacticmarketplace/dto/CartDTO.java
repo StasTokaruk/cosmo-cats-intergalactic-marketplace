@@ -1,6 +1,8 @@
 package org.example.cosmocatsintergalacticmarketplace.dto;
 
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -9,5 +11,5 @@ import java.util.List;
 public class CartDTO {
     private Long id;
     private List<ProductDetailDTO> products;
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 }

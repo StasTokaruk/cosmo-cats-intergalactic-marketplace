@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.example.cosmocatsintergalacticmarketplace.validation.CosmoWordCheck;
 
+import java.math.BigDecimal;
+
 @Getter
 @AllArgsConstructor
 @Builder
@@ -19,7 +21,7 @@ public class ProductDTO {
 
     @NotNull(message = "price must not be null")
     @Positive(message = "price must be positive")
-    private Double price;
+    private BigDecimal price;
 
     @Valid
     @NotNull(message = "category must be provided")
@@ -30,5 +32,5 @@ public class ProductDTO {
 
     @NotNull(message = "must be in stock")
     @Positive(message = "quantity must be positive and in stock")
-    private Double quantity;
+    private Integer quantity;
 }

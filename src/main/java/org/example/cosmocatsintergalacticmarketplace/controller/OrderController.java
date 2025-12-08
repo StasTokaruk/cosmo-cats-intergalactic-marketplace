@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.cosmocatsintergalacticmarketplace.dto.OrderDTO;
 import org.example.cosmocatsintergalacticmarketplace.mapper.OrderMapper;
 import org.example.cosmocatsintergalacticmarketplace.domain.Order;
+import org.example.cosmocatsintergalacticmarketplace.repositories.projection.TopProductProjection;
 import org.example.cosmocatsintergalacticmarketplace.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,11 @@ public class OrderController {
                 .map(orderMapper::toOrderDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/top-products")
+    public ResponseEntity<List<TopProductProjection>> getTopProducts() {
+        return ResponseEntity.ok(orderService.getTopSellingProducts());
     }
 
     @DeleteMapping("/{id}")

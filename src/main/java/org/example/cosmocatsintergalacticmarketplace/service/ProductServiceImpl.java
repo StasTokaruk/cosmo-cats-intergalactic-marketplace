@@ -1,56 +1,93 @@
 package org.example.cosmocatsintergalacticmarketplace.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cosmocatsintergalacticmarketplace.domain.Product;
-import org.example.cosmocatsintergalacticmarketplace.domain.Category;
+import org.example.cosmocatsintergalacticmarketplace.mapper.ProductMapper;
+import org.example.cosmocatsintergalacticmarketplace.repositories.ProductRepository;
+import org.example.cosmocatsintergalacticmarketplace.repositories.entity.ProductEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private final Map<Long, Product> store = new ConcurrentHashMap<>();
-    private final AtomicLong idGen = new AtomicLong(0);
-
-    @PostConstruct
-    void initMockData() {
-        store.put(1L, new Product(1L, "Laser Sword", BigDecimal.valueOf(999.0),
-                new Category(1L, "Electronics"), "Space weapon", 5.0));
-        store.put(2L, new Product(2L, "Cosmo Book", BigDecimal.valueOf(49.0),
-                new Category(2L, "Books"), "Manual for pilots", 20.0));
-        idGen.set(2);
-    }
-
-    private Long nextId() { return idGen.incrementAndGet(); }
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Override
+    @Transactional // Відкриває транзакцію для запису
     public Product create(Product product) {
-        Long id = nextId();
-        product.setId(id);
-        store.put(id, product);
-        System.out.println("Created product: " + product);
-        return product;
+        // 1. Конвертуємо Domain -> Entity
+        ProductEntity entity = productMapper.toEntity(product);
+
+        // 2. Зберігаємо в базу (id згенерується автоматично)
+        ProductEntity savedEntity = productRepository.save(entity);
+
+        // 3. Конвертуємо назад Entity -> Domain і повертаємо
+        return productMapper.toDomain(savedEntity);
     }
 
     @Override
-    public List<Product> findAll() { return new ArrayList<>(store.values()); }
+    @Transactional(readOnly = true) // Оптимізація для читання
+    public List<Product> findAll() {
+        return productRepository.findAll().stream()
+                .map(productMapper::toDomain) // Entity -> Domain
+                .collect(Collectors.toList());
+    }
 
     @Override
-    public Optional<Product> findById(Long id) { return Optional.ofNullable(store.get(id)); }
+    @Transactional(readOnly = true)
+    public Optional<Product> findById(Long id) {
+        return productRepository.findById(id)
+                .map(productMapper::toDomain);
+    }
 
     @Override
+    @Transactional
     public Optional<Product> update(Long id, Product product) {
-        if (!store.containsKey(id)) return Optional.empty();
-        product.setId(id);
-        store.put(id, product);
-        return Optional.of(product);
+        // Спочатку шукаємо, чи існує продукт
+        return productRepository.findById(id)
+                .map(existingEntity -> {
+                    // Оновлюємо поля знайденої сутності даними з Domain об'єкта
+
+                    existingEntity.setName(product.getName());
+                    existingEntity.setPrice(product.getPrice());
+                    existingEntity.setDescription(product.getDescription());
+
+                    // У вас в Domain quantity це Double, а в Entity це Integer.
+                    // Потрібне приведення типів
+                    if (product.getQuantity() != null) {
+                        existingEntity.setQuantity(product.getQuantity().intValue());
+                    }
+
+                    // Оновлення категорії (складніший момент, залежить від маппера)
+                    // Найпростіше: якщо категорія змінилася, маппер має створити нову CategoryEntity з ID
+                    if (product.getCategory() != null) {
+                        // Тут ми покладаємось на те, що productMapper.toEntity
+                        // коректно створює об'єкт категорії всередині.
+                        // Але для надійності часто роблять setCategory(categoryRepository.getReferenceById(...))
+                        ProductEntity updateSource = productMapper.toEntity(product);
+                        existingEntity.setCategory(updateSource.getCategory());
+                    }
+
+                    // Зберігаємо зміни
+                    return productRepository.save(existingEntity);
+                })
+                .map(productMapper::toDomain);
     }
 
     @Override
-    public boolean delete(Long id) { return store.remove(id) != null; }
+    @Transactional
+    public boolean delete(Long id) {
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }

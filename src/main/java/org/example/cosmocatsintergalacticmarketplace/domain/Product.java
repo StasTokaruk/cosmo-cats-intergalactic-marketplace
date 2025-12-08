@@ -17,7 +17,7 @@ public class Product {
     private BigDecimal price;
     private Category category;
     private String description;
-    private Double quantity;
+    private Integer quantity;
 }
 
 

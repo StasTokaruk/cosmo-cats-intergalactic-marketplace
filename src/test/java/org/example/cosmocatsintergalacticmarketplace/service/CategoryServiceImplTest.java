@@ -1,110 +1,178 @@
 package org.example.cosmocatsintergalacticmarketplace.service;
 
 import org.example.cosmocatsintergalacticmarketplace.domain.Category;
-import org.junit.jupiter.api.BeforeEach;
+import org.example.cosmocatsintergalacticmarketplace.mapper.CategoryMapper;
+import org.example.cosmocatsintergalacticmarketplace.repositories.CategoryRepository;
+import org.example.cosmocatsintergalacticmarketplace.repositories.entity.CategoryEntity;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
 
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private CategoryMapper categoryMapper;
+
+    @InjectMocks
     private CategoryServiceImpl service;
 
-    @BeforeEach
-    void setUp() {
-        service = new CategoryServiceImpl();
-    }
-
     @Test
-    void shouldCreateNewCategoryAndAssignId() {
-        Category category = new Category(null, "Space Gear");
+    void shouldCreateNewCategory() {
+        // GIVEN
+        Category inputCategory = new Category(null, "Space Gear");
+        CategoryEntity entityToSave = new CategoryEntity(null, "Space Gear", null);
+        CategoryEntity savedEntity = new CategoryEntity(1L, "Space Gear", null);
+        Category resultDomain = new Category(1L, "Space Gear");
 
-        Category created = service.create(category);
+        when(categoryMapper.toEntity(inputCategory)).thenReturn(entityToSave);
+        when(categoryRepository.save(entityToSave)).thenReturn(savedEntity);
+        when(categoryMapper.toDomain(savedEntity)).thenReturn(resultDomain);
 
-        assertNotNull(created.getId(), "Створена категорія має отримати ID");
+        // WHEN
+        Category created = service.create(inputCategory);
+
+        // THEN
+        assertNotNull(created.getId());
         assertEquals("Space Gear", created.getName());
-        assertEquals(1, service.findAll().size(), "У сховищі має бути 1 категорія");
+        verify(categoryRepository).save(entityToSave);
     }
 
     @Test
-    void shouldGenerateSequentialIds() {
-        Category first = service.create(new Category(null, "Category A"));
-        Category second = service.create(new Category(null, "Category B"));
-        Category third = service.create(new Category(null, "Category C"));
+    void shouldFindAllCategories() {
+        // GIVEN
+        CategoryEntity entity = new CategoryEntity(1L, "Cat A", "Desc");
+        Category domain = new Category(1L, "Cat A");
 
-        assertEquals(1L, first.getId());
-        assertEquals(2L, second.getId());
-        assertEquals(3L, third.getId());
-        assertTrue(second.getId() > first.getId(), "Наступний ID має бути більшим за попередній");
+        when(categoryRepository.findAll()).thenReturn(List.of(entity));
+        when(categoryMapper.toDomain(entity)).thenReturn(domain);
+
+        // WHEN
+        List<Category> categories = service.findAll();
+
+        // THEN
+        assertFalse(categories.isEmpty());
+        assertEquals(1, categories.size());
+        assertEquals("Cat A", categories.get(0).getName());
     }
 
     @Test
     void shouldReturnEmptyListWhenNoCategoriesExist() {
+        // GIVEN
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // WHEN
         List<Category> categories = service.findAll();
+
+        // THEN
         assertTrue(categories.isEmpty());
     }
 
     @Test
-    void shouldFindCategoryByIdAfterCreation() {
-        Category created = service.create(new Category(null, "Weapons"));
+    void shouldFindCategoryById() {
+        // GIVEN
+        Long id = 1L;
+        CategoryEntity entity = new CategoryEntity(id, "Weapons", "Desc");
+        Category domain = new Category(id, "Weapons");
 
-        Optional<Category> found = service.findById(created.getId());
+        when(categoryRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(categoryMapper.toDomain(entity)).thenReturn(domain);
 
+        // WHEN
+        Optional<Category> found = service.findById(id);
+
+        // THEN
         assertTrue(found.isPresent());
         assertEquals("Weapons", found.get().getName());
     }
 
     @Test
     void shouldReturnEmptyIfNotFound() {
+        // GIVEN
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // WHEN
         Optional<Category> found = service.findById(99L);
+
+        // THEN
         assertTrue(found.isEmpty());
     }
 
     @Test
     void shouldUpdateExistingCategory() {
-        Category existing = service.create(new Category(null, "Old Name"));
-        Long existingId = existing.getId();
+        // GIVEN
+        Long id = 1L;
+        Category updateInfo = new Category(null, "New Name");
 
-        Category update = new Category(null, "New Name");
+        CategoryEntity existingEntity = new CategoryEntity(id, "Old Name", "Desc");
+        CategoryEntity updatedEntity = new CategoryEntity(id, "New Name", "Desc"); // Те, що поверне save
+        Category domainResult = new Category(id, "New Name");
 
-        Optional<Category> result = service.update(existingId, update);
+        when(categoryRepository.findById(id)).thenReturn(Optional.of(existingEntity));
+        when(categoryRepository.save(existingEntity)).thenReturn(updatedEntity);
+        when(categoryMapper.toDomain(updatedEntity)).thenReturn(domainResult);
 
+        // WHEN
+        Optional<Category> result = service.update(id, updateInfo);
+
+        // THEN
         assertTrue(result.isPresent());
-        assertEquals(existingId, result.get().getId(), "ID оновленої категорії має збігатися");
-        assertEquals("New Name", result.get().getName(), "Назва має бути оновлена");
-        assertEquals("New Name", service.findById(existingId).get().getName());
+        assertEquals("New Name", result.get().getName());
+        verify(categoryRepository).save(existingEntity);
     }
 
     @Test
     void shouldReturnEmptyWhenUpdatingNonExisting() {
+        // GIVEN
+        when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
         Category fake = new Category(null, "Fake");
 
+        // WHEN
         Optional<Category> result = service.update(999L, fake);
-        assertTrue(result.isEmpty(), "Оновлення неіснуючої категорії має повернути порожній Optional");
+
+        // THEN
+        assertTrue(result.isEmpty());
+        verify(categoryRepository, never()).save(any());
     }
 
     @Test
     void shouldDeleteExistingCategory() {
-        Category existing = service.create(new Category(null, "Temp"));
-        Long existingId = existing.getId();
+        // GIVEN
+        Long id = 1L;
+        when(categoryRepository.existsById(id)).thenReturn(true);
 
-        boolean deleted = service.delete(existingId);
+        // WHEN
+        boolean deleted = service.delete(id);
 
-        assertTrue(deleted, "Видалення існуючої категорії має повернути true");
-        assertEquals(0, service.findAll().size(), "Після видалення сховище має бути порожнім");
-        assertTrue(service.findById(existingId).isEmpty(), "Видалену категорію не можна знайти");
+        // THEN
+        assertTrue(deleted);
+        verify(categoryRepository).deleteById(id);
     }
 
     @Test
     void shouldReturnFalseWhenDeletingNonExisting() {
-        service.create(new Category(null, "Still Here"));
+        // GIVEN
+        Long id = 999L;
+        when(categoryRepository.existsById(id)).thenReturn(false);
 
-        boolean deleted = service.delete(999L);
+        // WHEN
+        boolean deleted = service.delete(id);
 
-        assertFalse(deleted, "Видалення неіснуючої категорії має повернути false");
-        assertEquals(1, service.findAll().size(), "Кількість категорій не має змінитися");
+        // THEN
+        assertFalse(deleted);
+        verify(categoryRepository, never()).deleteById(any());
     }
 }

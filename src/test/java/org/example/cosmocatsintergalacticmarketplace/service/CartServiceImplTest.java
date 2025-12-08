@@ -5,6 +5,7 @@ import org.example.cosmocatsintergalacticmarketplace.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ class CartServiceImplTest {
 
     @Test
     void shouldCreateNewCart() {
-        Cart newCart = new Cart(null, EMPTY_ITEMS, 0.0);
+        Cart newCart = new Cart(null, EMPTY_ITEMS, BigDecimal.ZERO);
 
         Cart created = service.create(newCart);
 
@@ -57,15 +58,15 @@ class CartServiceImplTest {
 
     @Test
     void shouldGenerateSequentialIds() {
-        Cart first = service.create(new Cart(null, EMPTY_ITEMS, 0.0));
-        Cart second = service.create(new Cart(null, EMPTY_ITEMS, 0.0));
+        Cart first = service.create(new Cart(null, EMPTY_ITEMS, BigDecimal.ZERO));
+        Cart second = service.create(new Cart(null, EMPTY_ITEMS, BigDecimal.ZERO));
 
         assertTrue(second.getId() > first.getId(), "Наступний ID має бути більшим за попередній");
     }
 
     @Test
     void shouldUpdateExistingCart() {
-        Cart update = new Cart(null, EMPTY_ITEMS, 99.99);
+        Cart update = new Cart(null, EMPTY_ITEMS, BigDecimal.valueOf(99.99));
 
         Optional<Cart> result = service.update(1L, update);
 
@@ -75,7 +76,7 @@ class CartServiceImplTest {
 
     @Test
     void shouldReturnEmptyWhenUpdatingNonExisting() {
-        Cart fake = new Cart(null, EMPTY_ITEMS, 1.0);
+        Cart fake = new Cart(null, EMPTY_ITEMS, BigDecimal.ONE);
 
         Optional<Cart> result = service.update(999L, fake);
         assertTrue(result.isEmpty(), "Оновлення неіснуючого кошика має повернути порожній Optional");

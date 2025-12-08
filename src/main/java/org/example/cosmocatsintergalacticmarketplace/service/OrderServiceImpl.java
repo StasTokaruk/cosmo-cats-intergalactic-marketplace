@@ -1,52 +1,95 @@
 package org.example.cosmocatsintergalacticmarketplace.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cosmocatsintergalacticmarketplace.domain.Order;
+import org.example.cosmocatsintergalacticmarketplace.mapper.OrderMapper;
+import org.example.cosmocatsintergalacticmarketplace.repositories.OrderRepository;
+import org.example.cosmocatsintergalacticmarketplace.repositories.entity.OrderEntity;
+import org.example.cosmocatsintergalacticmarketplace.repositories.projection.TopProductProjection;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private final Map<Long, Order> store = new ConcurrentHashMap<>();
-    private final AtomicLong idGen = new AtomicLong(0);
-
-    @PostConstruct
-    void initMockData() {
-        store.put(1L, new Order(1L, new ArrayList<>(), BigDecimal.ZERO));
-        store.put(2L, new Order(2L, new ArrayList<>(), BigDecimal.ZERO));
-        idGen.set(2);
-    }
-
-    private Long nextId() { return idGen.incrementAndGet(); }
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
 
     @Override
+    @Transactional
     public Order create(Order order) {
-        Long id = nextId();
-        order.setId(id);
-        store.put(id, order);
-        return order;
+        OrderEntity entity = orderMapper.toEntity(order);
+
+
+        if (entity.getOrderNumber() == null) {
+            entity.setOrderNumber("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
+
+        entity.setCreatedAt(LocalDateTime.now());
+
+        if (entity.getItems() != null) {
+            entity.getItems().forEach(item -> item.setOrder(entity));
+        }
+
+        OrderEntity savedEntity = orderRepository.save(entity);
+        return orderMapper.toDomain(savedEntity);
     }
 
     @Override
-    public List<Order> findAll() { return new ArrayList<>(store.values()); }
+    @Transactional(readOnly = true)
+    public List<Order> findAll() {
+        return orderRepository.findAll().stream()
+                .map(orderMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 
     @Override
-    public Optional<Order> findById(Long id) { return Optional.ofNullable(store.get(id)); }
+    @Transactional(readOnly = true)
+    public Optional<Order> findById(Long id) {
+        return orderRepository.findById(id)
+                .map(orderMapper::toDomain);
+    }
+
+    // Додатковий метод для пошуку за Natural ID
+    @Transactional(readOnly = true)
+    public Optional<Order> findByOrderNumber(String orderNumber) {
+        return orderRepository.findByOrderNumber(orderNumber)
+                .map(orderMapper::toDomain);
+    }
 
     @Override
+    @Transactional
     public Optional<Order> update(Long id, Order order) {
-        if (!store.containsKey(id)) return Optional.empty();
-        order.setId(id);
-        store.put(id, order);
-        return Optional.of(order);
+        return orderRepository.findById(id)
+                .map(existingEntity -> {
+                    existingEntity.setTotalPrice(order.getTotalPrice());
+
+                    return orderRepository.save(existingEntity);
+                })
+                .map(orderMapper::toDomain);
     }
 
     @Override
-    public boolean delete(Long id) { return store.remove(id) != null; }
+    @Transactional
+    public boolean delete(Long id) {
+        if (orderRepository.existsById(id)) {
+            orderRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TopProductProjection> getTopSellingProducts() {
+        return orderRepository.findTopSellingProducts();
+    }
 }
