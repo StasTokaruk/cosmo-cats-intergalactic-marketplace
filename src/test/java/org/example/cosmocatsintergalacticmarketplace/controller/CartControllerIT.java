@@ -1,6 +1,7 @@
 package org.example.cosmocatsintergalacticmarketplace.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.cosmocatsintergalacticmarketplace.AbstractIntegrationTest;
 import org.example.cosmocatsintergalacticmarketplace.domain.Cart;
 import org.example.cosmocatsintergalacticmarketplace.dto.CartDTO;
 import org.example.cosmocatsintergalacticmarketplace.service.CartService;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class CartControllerIT {
+class CartControllerIT extends AbstractIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
